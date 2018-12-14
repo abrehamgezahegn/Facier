@@ -1,0 +1,36 @@
+.input-container{
+	display: flex;
+	justify-content: center;
+	margin:10px;
+}
+
+.input{
+	width:500px;
+	padding: 10px;
+	height: 40px;
+	font-size: 15px
+}
+.button{
+	background: rgb(170,90,182);
+	color: white;
+	border:none;
+	outline: 0px;
+	width:90px;
+}
+@media(max-width:650px){
+	.input-container{
+	display: flex;
+	justify-content: center;
+	margin:10px;
+	flex-wrap: wrap;
+}
+.button{
+	background: rgb(170,90,182);
+	color: white;
+	border:none;
+	outline: 0px;
+	width:500px;
+	padding: 10px 0 10px 0;
+	margin-top: 5px;
+}
+}

@@ -1,0 +1,8 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  background: linear-gradient(to left, rgb(74,207,215) , rgb(170,90,182));
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}

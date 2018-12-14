@@ -1,0 +1,42 @@
+.main-container {
+	height: 100%;
+}
+
+.form-container {
+	width: 400px;
+	border: none !important;
+}
+@media (max-width: 600px) {
+	.form-container {
+		width: 300px;
+		border: none !important;
+	}
+}
+.sign-in {
+	margin: 20px;
+}
+
+.icon {
+	margin: 10px;
+	color: #1c2331;
+}
+.signIn-btn {
+	background-color: #1c2331 !important;
+	outline: none !important;
+	border: none !important;
+}
+
+.register-link {
+	font-size: 19px;
+	/*color: #3949ab;*/
+	margin-left: 4px;
+}
+.facebook:hover {
+	color: #1a237e;
+}
+.twitter:hover {
+	color: #1565c0;
+}
+.linkedin:hover {
+	color: #0d47a1;
+}
