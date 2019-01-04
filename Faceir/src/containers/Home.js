@@ -7,6 +7,7 @@ import Recognition from "../components/Recognition/Recognition";
 import "./Home.css";
 import Clarifai from "clarifai";
 import { AuthConsumer } from "../contexts/MyAuthProvider";
+import axios from "axios";
 
 import Particles from "react-particles-js";
 
@@ -30,7 +31,7 @@ import Particles from "react-particles-js";
 // };
 
 const app = new Clarifai.App({
-	apiKey: "0c1ed158dab644ef81e4315449a4cd2e"
+	apiKey: "765407f142ad45a888f78f8a622c9c37"
 });
 
 class App extends Component {
@@ -41,11 +42,33 @@ class App extends Component {
 			nameImage: "",
 			detect: false,
 			user: {
-				id: this.props.location.state.userData.id,
-				name: this.props.location.state.userData.name,
-				entries: this.props.location.state.userData.entries
+				id: undefined,
+				name: undefined,
+				entries: undefined
 			}
 		};
+	}
+
+	componentDidMount() {
+		fetch(
+			`http://localhost:3000/profile/${
+				this.props.location.state.userData.id
+			}`
+		)
+			.then(res => res.json())
+			.then(user => {
+				const entries = user.entries;
+				return entries;
+			})
+			.then(entries => {
+				this.setState({
+					user: {
+						id: this.props.location.state.userData.id,
+						name: this.props.location.state.userData.name,
+						entries
+					}
+				});
+			});
 	}
 
 	loaded = () => {
@@ -60,42 +83,52 @@ class App extends Component {
 
 	handleSubmit = event => {
 		event.preventDefault();
-		fetch("http://localhost:3000/image", {
+		const token = localStorage.getItem("token");
+		axios({
 			method: "put",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
-				id: this.state.user.id
-			})
-		})
-			.then(res => res.json())
-			.then(count => {
-				this.setState(
-					Object.assign(this.state.user, {
-						entries: count
+			url: "http://localhost:3000/image",
+			data: {
+				id: this.state.user.id,
+				token
+			}
+		}).then(res => {
+			if (res.data !== "invalid token") {
+				localStorage.setItem("token", res.data.token);
+
+				app.models
+					.predict(
+						"e466caa0619f444ab97497640cefc4dc",
+						this.state.input
+					)
+					.then(response => {
+						console.log(response);
+						const value =
+							response.outputs[0].data.regions[0].data.face
+								.identity.concepts[0].name;
+						return value;
 					})
-				);
-			});
-		// app.models
-		// 	.predict("e466caa0619f444ab97497640cefc4dc", this.state.input)
-		// 	.then(function(response) {
-		// 		console.log(response);
-		// 		const value =
-		// 			response.outputs[0].data.regions[0].data.face.identity
-		// 				.concepts[0].name;
-		// 		return value;
-		// 	})
-		// 	.then(name => {
-		// 		if (!!name) {
+					.then(name => {
+						if (!!name) {
+							console.log(name);
+							this.setState({
+								nameImage: name,
+								detect: !this.state.detect
+							});
 
-		// 		}
-		// 		this.setState({ nameImage: name });
-		// 	});
-
-		// this.setState({ detect: !this.state.detect });
+							this.setState(
+								Object.assign(this.state.user, {
+									entries: data.entries
+								})
+							);
+						}
+					});
+			} else if (res.data === "invalid token") {
+				localStorage.removeItem("token");
+				this.props.history.push("/signin");
+			}
+		});
 	};
-
 	render() {
-		console.log(this.state.user.name);
 		return (
 			<div>
 				{/*<Particles className="particles" params={particlesProps} />*/}

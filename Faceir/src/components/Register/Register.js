@@ -2,6 +2,17 @@ import React, { Component } from "react";
 import "./Reg.css";
 import { Fa } from "mdbreact";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import zxcvbn from "zxcvbn";
+import owasp from "owasp-password-strength-test";
+
+owasp.config({
+	allowPassphrases: true,
+	maxLength: 128,
+	minLength: 10,
+	minPhraseLength: 20,
+	minOptionalTestsToPass: 4
+});
 
 class Register extends Component {
 	constructor(props) {
@@ -10,6 +21,7 @@ class Register extends Component {
 			name: "",
 			email: "",
 			password: "",
+			passErrors: [],
 			conPass: "",
 			errorMessage: "",
 			matchingErr: "",
@@ -18,6 +30,9 @@ class Register extends Component {
 		};
 	}
 
+	componentDidMount() {
+		localStorage.removeItem("token");
+	}
 	handleName = e => {
 		const name = e.target.value;
 		this.setState({ name });
@@ -28,36 +43,46 @@ class Register extends Component {
 	};
 	handlePassword = e => {
 		const password = e.target.value;
-		console.log(password);
-		this.setState({ password });
+		const { errors } = owasp.test(password);
+		this.setState({ passErrors: errors });
+		if (errors.length === 0) {
+			this.setState({ password });
+		}
 	};
 	handleConPassword = e => {
 		const conPass = e.target.value;
 		this.setState({ conPass });
 	};
 	handleSubmit = () => {
-		let { name, email, password, conPass } = this.state;
-		if (conPass !== password) {
+		let { name, email, password, conPass, passErrors } = this.state;
+		if (passErrors.length === 0 && conPass !== password) {
 			this.setState({ matchingErr: "Bruh passwords do not match!!" });
 		} else {
 			this.setState({ matchingErr: "" });
-			if (name.length > 0 && email.length > 0 && password.length > 0) {
-				fetch("http://localhost:3000/register", {
+			if (
+				name.length > 0 &&
+				email.length > 0 &&
+				password.length > 0 &&
+				passErrors.length === 0
+			) {
+				axios({
 					method: "post",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({
+					url: "http://localhost:3000/register",
+					data: {
 						name: this.state.name,
 						email: this.state.email,
 						password: this.state.password
-					})
-				})
-					.then(res => res.json())
-					.then(data => {
-						if (data) {
-							this.props.grantAccess();
-							this.props.historyPush(data);
-						}
-					});
+					}
+				}).then(res => {
+					if (res.data) {
+						this.props.grantAccess(res.data.token);
+						this.props.historyPush(res.data.user);
+					}
+				});
+			} else if (passErrors.length > 0) {
+				this.setState({
+					errorMessage: "password doesn't match the requirements!"
+				});
 			} else {
 				this.setState({ errorMessage: "Please fill out all forms." });
 			}
@@ -68,7 +93,7 @@ class Register extends Component {
 			<div className="d-flex justify-content-center align-items-center main-container">
 				<div className="text-center  p-2 form-container shadow-4">
 					<h4 className="sign-in">Sign up</h4>
-					<p> {this.state.errorMessage} </p>
+					<p style={{ color: "red" }}> {this.state.errorMessage} </p>
 					<div className="form-row mb-4">
 						<div className="col">
 							<input
@@ -94,12 +119,13 @@ class Register extends Component {
 						aria-describedby="defaultRegisterFormPasswordHelpBlock"
 						onChange={this.handlePassword}
 					/>
-					<small
-						id="defaultRegisterFormPasswordHelpBlock"
-						className="form-text  mb-4 auth"
-					>
-						At least 8 characters and 1 digit
-					</small>
+					<div className="d-flex mb-4 flex-column align-items-left text-left">
+						{this.state.passErrors.map(err => (
+							<small className="form-text   auth" key={err}>
+								{err}
+							</small>
+						))}
+					</div>
 					<input
 						type="password"
 						className="form-control"
@@ -121,22 +147,9 @@ class Register extends Component {
 						<p className="mt-1"> Already have an account?</p>
 						<Link to="/SignIn" className="login-link">
 							{" "}
-							Login{" "}
+							Signin{" "}
 						</Link>
 					</div>
-					<hr />
-					<p>
-						By clicking
-						<em>Sign up</em> you agree to our
-						<a href="" target="_blank">
-							terms of service
-						</a>{" "}
-						and
-						<a href="" target="_blank">
-							terms of service
-						</a>
-						.{" "}
-					</p>
 				</div>
 			</div>
 		);

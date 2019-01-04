@@ -9,9 +9,12 @@ class SignIn extends Component {
 		this.state = {
 			signInEmail: "",
 			signInPassword: "",
-			errorMessage: "",
-			wrongEntrieMes: ""
+			errorMessage: ""
 		};
+	}
+
+	componentDidMount() {
+		localStorage.removeItem("token");
 	}
 
 	handleEmailChange = e => {
@@ -39,13 +42,18 @@ class SignIn extends Component {
 			})
 				.then(res => res.json())
 				.then(data => {
-					if (data !== "error") {
-						this.props.grantAccess();
-						this.props.historyPush(data);
+					if (data === "wrong credentials") {
+						this.setState({
+							errorMessage:
+								"You have enterd wrong email or password"
+						});
+					} else if (data.user.email.length > 0) {
+						this.props.grantAccess(data.token);
+						this.props.historyPush(data.user);
 					} else
 						this.setState({
-							wrongEntrieMes:
-								"You have enterd wrong email or pass"
+							errorMessage:
+								"You have enterd wrong email or password"
 						});
 				});
 
@@ -57,8 +65,7 @@ class SignIn extends Component {
 			<div className="d-flex justify-content-center align-items-center main-container">
 				<div className="text-center p-2 form-container shadow-4">
 					<h4 className="sign-in">Sign in</h4>
-					<p> {this.state.errorMessage} </p>
-					<p> {this.state.wrongEntrieMes} </p>
+					<p style={{ color: "red" }}> {this.state.errorMessage} </p>
 					<input
 						type="email"
 						id="defaultLoginFormEmail"

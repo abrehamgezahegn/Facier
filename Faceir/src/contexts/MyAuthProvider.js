@@ -10,9 +10,9 @@ class MyAuthProvider extends Component {
 		isAuthed: false
 	};
 
-	grantAccess = () => {
+	grantAccess = token => {
 		this.setState({ isAuthed: true });
-		localStorage.setItem("token", "asdas sadasasd");
+		localStorage.setItem("token", token);
 	};
 
 	takeAccess = () => {

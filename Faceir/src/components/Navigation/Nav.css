@@ -1,22 +1,20 @@
-.link{
+.link {
 	color: black;
-	text-decoration: none;	
+	text-decoration: none;
 }
-.link:hover{
+.link:hover {
 	color: black;
 }
-.link:active{
-	color: #0d47a1 ;
-
-	
+.link:active {
+	color: #0d47a1;
 }
-.nav{
-	margin: 20px;
+.nav {
+	margin-top: 30px;
+	margin-bottom: 100px;
 	font-weight: 600;
 	font-size: 20px;
 	font-family: Courier New;
-	color:white;
+	color: white;
 	outline: none;
 	width: 100px;
-
 }

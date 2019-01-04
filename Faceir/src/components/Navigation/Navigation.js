@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { AuthConsumer } from "../../contexts/MyAuthProvider";
 
 const Navigation = () => (
-	<div>
+	<div className="ml-4 mt-5 mb-20">
 		<div className="nav d-flex justify-content-end">
 			<AuthConsumer>
 				{context => (
