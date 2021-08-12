@@ -32,7 +32,7 @@ class SignIn extends Component {
       this.state.signInEmail.length > 0 &&
       this.state.signInPassword.length > 0
     ) {
-      fetch(`${process.env.BACKEND_URL}/signin`, {
+      fetch(`${process.env.REACT_APP_BACKEND_URL}/signin`, {
         method: "post",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -48,11 +48,15 @@ class SignIn extends Component {
             });
           } else if (data.user.email.length > 0) {
             this.props.grantAccess(data.token);
+            console.log("res", data);
             this.props.historyPush(data.user);
           } else
             this.setState({
               errorMessage: "You have enterd wrong email or password",
             });
+        })
+        .catch((err) => {
+          console.log("error", err);
         });
 
       this.setState({ errorMessage: "" });

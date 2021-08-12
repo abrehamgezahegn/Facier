@@ -3,7 +3,6 @@ import "./Reg.css";
 import { Fa } from "mdbreact";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import zxcvbn from "zxcvbn";
 import owasp from "owasp-password-strength-test";
 
 owasp.config({
@@ -32,7 +31,6 @@ class Register extends Component {
 
   componentDidMount() {
     localStorage.removeItem("token");
-    console.log("ennvvv", process.env.BACKEND_URL);
   }
   handleName = (e) => {
     const name = e.target.value;
@@ -57,7 +55,7 @@ class Register extends Component {
   handleSubmit = () => {
     let { name, email, password, conPass, passErrors } = this.state;
     if (passErrors.length === 0 && conPass !== password) {
-      this.setState({ matchingErr: "Bruh passwords do not match!!" });
+      this.setState({ matchingErr: "Passwords do not match." });
     } else {
       this.setState({ matchingErr: "" });
       if (
@@ -68,18 +66,26 @@ class Register extends Component {
       ) {
         axios({
           method: "post",
-          url: `https://facier-api.herokuapp.com/register`,
+          url: `${process.env.REACT_APP_BACKEND_URL}/register`,
           data: {
             name: this.state.name,
             email: this.state.email,
             password: this.state.password,
           },
-        }).then((res) => {
-          if (res.data) {
-            this.props.grantAccess(res.data.token);
-            this.props.historyPush(res.data.user);
-          }
-        });
+        })
+          .then((res) => {
+            console.log("res", res.data);
+            if (res.data) {
+              this.props.grantAccess(res.data.token);
+              this.props.historyPush(res.data.user);
+            }
+          })
+          .catch((err) => {
+            console.log("err ", err);
+            // if (err.error === "duplicateEmail") {
+            this.setState({ errorMessage: "Email already exists" });
+            // }
+          });
       } else if (passErrors.length > 0) {
         this.setState({
           errorMessage: "password doesn't match the requirements!",

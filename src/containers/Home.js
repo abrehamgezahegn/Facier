@@ -11,24 +11,24 @@ import axios from "axios";
 
 import Particles from "react-particles-js";
 
-// const particlesProps = {
-// 	particles: {
-// 		line_linked: {
-// 			shadow: {
-// 				enable: true,
-// 				color: "#3CA9D1",
-// 				blur: 5
-// 			}
-// 		},
-// 		number: {
-// 			value: 70,
-// 			density: {
-// 				enable: true,
-// 				value_area: 800
-// 			}
-// 		}
-// 	}
-// };
+const particlesProps = {
+  particles: {
+    line_linked: {
+      shadow: {
+        enable: true,
+        color: "#3CA9D1",
+        blur: 5,
+      },
+    },
+    number: {
+      value: 70,
+      density: {
+        enable: true,
+        value_area: 800,
+      },
+    },
+  },
+};
 
 const app = new Clarifai.App({
   apiKey: "765407f142ad45a888f78f8a622c9c37",
@@ -51,7 +51,7 @@ class App extends Component {
 
   componentDidMount() {
     fetch(
-      `process.env.BACKEND_URL/profile/${this.props.location.state.userData.id}`
+      `${process.env.BACKEND_URL}/profile/${this.props.location.state.userData.id}`
     )
       .then((res) => res.json())
       .then((user) => {
@@ -84,7 +84,7 @@ class App extends Component {
     const token = localStorage.getItem("token");
     axios({
       method: "put",
-      url: `${process.env.BACKEND_URL}/image`,
+      url: `${process.env.REACT_APP_BACKEND_URL}/image`,
       data: {
         id: this.state.user.id,
         token,
@@ -126,9 +126,12 @@ class App extends Component {
   render() {
     return (
       <div>
-        {/*<Particles className="particles" params={particlesProps} />*/}
+        <Particles className="particles" params={particlesProps} />
         <Navigation />
-        <Rank name={this.state.user.name} entries={this.state.user.entries} />
+        <Rank
+          name={this.props.location.state.userData.name}
+          entries={this.state.user.entries}
+        />
         <Input
           handleChange={this.handleChange}
           handleSubmit={this.handleSubmit}
